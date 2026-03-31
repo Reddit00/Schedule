@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Розклад РФКІТ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <section id="role-selection" class="container">
+        <div class="main-card">
+            <h1>Розклад занять РФКІТ</h1>
+            <div class="roles-grid">
+                <div class="role-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3330/3330314.png" width="60">
+                    <h2>Студент / Гість</h2>
+                    <p>Перегляд розкладу, пошук за групами та викладачами</p>
+                    <button onclick="showPage('guest-view')" class="btn-blue">Увійти як гість</button>
+                </div>
+                <div class="role-card">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3930/3930225.png" width="60">
+                    <h2>Адміністратор</h2>
+                    <p>Редагування розкладу, контроль вичитки годин та логи</p>
+                    <button onclick="showPage('login-view')" class="btn-dark">Авторизація</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="login-view" class="container hidden">
+        <div class="login-card">
+            <h2>Вхід для адміністратора</h2>
+            <input type="text" id="username" placeholder="Логін">
+            <input type="password" id="password" placeholder="Пароль">
+            <p id="login-error" class="error-msg"></p>
+            <button onclick="handleLogin()" class="btn-dark">Увійти</button>
+            <button onclick="showPage('role-selection')" class="btn-link">Назад</button>
+        </div>
+    </section>
+
+    <section id="guest-view" class="container-full hidden">
+        <header class="navbar">
+            <span class="logo">Розклад РФКІТ</span>
+            <div class="user-info">
+                <span id="user-role-label">Гість</span>
+                <button onclick="showPage('role-selection')" class="btn-outline">Вийти</button>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="filters">
+                <select id="filter-group"><option value="">Група: Усі</option></select>
+                <select id="filter-teacher"><option value="">Вчитель: Усі</option></select>
+                <select id="filter-subject"><option value="">Предмет: Усі</option></select>
+                <input type="date" id="filter-date">
+                <button onclick="loadSchedule()" class="btn-blue">Пошук</button>
+            </div>
+
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>День</th>
+                        <th>№</th>
+                        <th>Час</th>
+                        <th>Предмет</th>
+                        <th>Вчитель</th>
+                        <th>Клас</th>
+                        <th>Кабінет</th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-body">
+                    </tbody>
+            </table>
+        </main>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
