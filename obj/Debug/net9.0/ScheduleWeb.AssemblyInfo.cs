@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ScheduleWeb")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+379f2387f1ea747f32b49fa422773158190e3c7b")]
 [assembly: System.Reflection.AssemblyProductAttribute("ScheduleWeb")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ScheduleWeb")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
