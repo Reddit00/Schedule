@@ -4,8 +4,9 @@ namespace ScheduleWeb.Repositories;
 
 public interface IScheduleRepository
 {
-    Task<IEnumerable<Schedule>> GetFilteredScheduleAsync(int? groupId, string? date);
-    Task<int> GetTotalHoursBySubjectAsync(int groupId, int subjectId);
+    Task<IEnumerable<Schedule>> GetScheduleAsync(string? date, int? groupId);
+    Task<Schedule?> GetByIdAsync(int id);
     Task AddAsync(Schedule schedule);
-    Task<bool> SaveChangesAsync();
+    Task UpdateAsync(Schedule schedule);
+    Task DeleteAsync(int id);
 }

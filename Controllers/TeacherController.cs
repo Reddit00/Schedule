@@ -12,6 +12,20 @@ public class TeacherController : ControllerBase
     public TeacherController(ApplicationDbContext context) => _context = context;
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() => 
-        Ok(await _context.Teachers.Where(t => t.IsDeleted == 0).ToListAsync());
+    public async Task<IActionResult> GetAll()
+    {
+        var teachers = await _context.Teachers
+            .Where(t => t.IsDeleted == 0)
+            .OrderBy(t => t.FullName)
+            .ToListAsync();
+        return Ok(teachers);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var teacher = await _context.Teachers.FindAsync(id);
+        if (teacher == null) return NotFound();
+        return Ok(teacher);
+    }
 }

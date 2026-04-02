@@ -2,53 +2,53 @@ using Microsoft.EntityFrameworkCore;
 using ScheduleWeb.Data;
 using ScheduleWeb.Repositories;
 using ScheduleWeb.Services;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. ДОДАВАННЯ СЕРВІСІВ (Контейнер залежностей)
-builder.Services.AddControllers();
+// 1. ФІКСУЄМО АБСОЛЮТНИЙ ШЛЯХ ДО БАЗИ
+string dbPath = Path.Combine(Directory.GetCurrentDirectory(), "school.db");
 
-// Налаштування Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+Console.WriteLine("\n==========================================");
+Console.WriteLine($"ШЛЯХ ДО БАЗИ ДАНИХ: {dbPath}");
+Console.WriteLine("==========================================\n");
 
-// Налаштування підключення до SQLite
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite($"Data Source={dbPath}"));
 
-// Реєстрація твоїх власних репозиторіїв та сервісів
+// 2. Реєстрація сервісів
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<IValidationService, ValidationService>();
 
-// Налаштування CORS (щоб фронтенд не блокувався браузером)
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", policy => {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-});
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// 2. НАЛАШТУВАННЯ HTTP-КОНВЕЄРА (Порядок критично важливий!)
+// 3. ПЕРЕСТВОРЕННЯ БАЗИ (Адмін додасться автоматично з ApplicationDbContext)
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    // Видаляємо старий глючний файл
+    context.Database.EnsureDeleted();
+    
+    // Створюємо нову базу (всі таблиці + адмін з твого DbContext)
+    context.Database.EnsureCreated();
+    Console.WriteLine(">>> База даних успішно ПЕРЕСТВОРЕНА з нуля!");
+}
 
-// Вмикаємо Swagger незалежно від середовища, щоб ти завжди міг перевірити API
-app.UseSwagger();
-app.UseSwaggerUI(c => {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Розклад РФКІТ API v1");
-});
+// 4. Налаштування Middleware
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-// ПІДТРИМКА ФРОНТЕНДУ (wwwroot)
-// Спочатку шукаємо index.html, потім дозволяємо роздавати статичні файли (css/js)
-app.UseDefaultFiles(); 
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.UseRouting();
-app.UseCors("AllowAll");
-
-app.UseAuthorization();
-
-// Мапінг контролерів API
 app.MapControllers();
 
-// Запуск сервера
 app.Run();

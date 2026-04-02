@@ -16,9 +16,11 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login(LoginRequestDto dto)
     {
         var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Username == dto.Username && u.PasswordHash == dto.Password);
+            .FirstOrDefaultAsync(u => u.Username.ToLower() == dto.Username.ToLower() 
+                                  && u.PasswordHash == dto.Password);
 
         if (user == null) return Unauthorized("Невірний логін або пароль");
-        return Ok(new { success = true, roleId = user.RoleId });
+
+        return Ok(new { success = true, roleId = user.RoleId, fullName = user.FullName });
     }
 }

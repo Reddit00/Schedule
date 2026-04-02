@@ -1,9 +1,7 @@
-using ScheduleWeb.Models;
-
 namespace ScheduleWeb.Services;
 
 public interface IValidationService
 {
-    // Повертає кортеж: (чи валідно, повідомлення про помилку)
-    Task<(bool isValid, string message)> ValidateScheduleAsync(Schedule newLesson);
+    Task<bool> IsAudienceFreeAsync(int audienceId, int lessonNumber, string dayOfWeek, string? date);
+    Task<bool> IsTeacherFreeAsync(int teacherId, int lessonNumber, string dayOfWeek, string? date);
 }

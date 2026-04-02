@@ -7,39 +7,47 @@ namespace ScheduleWeb.Repositories;
 public class ScheduleRepository : IScheduleRepository
 {
     private readonly ApplicationDbContext _context;
+    public ScheduleRepository(ApplicationDbContext context) => _context = context;
 
-    public ScheduleRepository(ApplicationDbContext context)
+    public async Task<IEnumerable<Schedule>> GetScheduleAsync(string? date, int? groupId)
     {
-        _context = context;
-    }
-
-    public async Task<IEnumerable<Schedule>> GetFilteredScheduleAsync(int? groupId, string? date)
-    {
-        return await _context.Schedules
+        var query = _context.Schedules
             .Include(s => s.Group)
             .Include(s => s.Teacher)
             .Include(s => s.Subject)
             .Include(s => s.Audience)
-            .Where(s => (!groupId.HasValue || s.GroupId == groupId) && 
-                        (string.IsNullOrEmpty(date) || s.Date == date))
-            .OrderBy(s => s.Date)
-            .ThenBy(s => s.LessonNumber)
-            .ToListAsync();
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(date))
+            query = query.Where(s => s.Date == date);
+        
+        if (groupId.HasValue)
+            query = query.Where(s => s.GroupId == groupId);
+
+        return await query.OrderBy(s => s.LessonNumber).ToListAsync();
     }
 
-    public async Task<int> GetTotalHoursBySubjectAsync(int groupId, int subjectId)
-    {
-        return await _context.Schedules
-            .CountAsync(s => s.GroupId == groupId && s.SubjectId == subjectId) * 2;
+    public async Task<Schedule?> GetByIdAsync(int id) => await _context.Schedules.FindAsync(id);
+
+    public async Task AddAsync(Schedule schedule) 
+    { 
+        await _context.Schedules.AddAsync(schedule); 
+        await _context.SaveChangesAsync(); 
     }
 
-    public async Task AddAsync(Schedule schedule)
+    public async Task UpdateAsync(Schedule schedule)
     {
-        await _context.Schedules.AddAsync(schedule);
+        _context.Schedules.Update(schedule);
+        await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> SaveChangesAsync()
+    public async Task DeleteAsync(int id)
     {
-        return (await _context.SaveChangesAsync()) >= 0;
+        var item = await GetByIdAsync(id);
+        if (item != null)
+        {
+            _context.Schedules.Remove(item);
+            await _context.SaveChangesAsync();
+        }
     }
 }

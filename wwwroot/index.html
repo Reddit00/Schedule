@@ -7,20 +7,20 @@
 </head>
 <body>
 
-    <section id="role-selection" class="container">
+    <section id="role-selection" class="container active">
         <div class="main-card">
             <h1>Розклад занять РФКІТ</h1>
             <div class="roles-grid">
                 <div class="role-card">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3330/3330314.png" width="60">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3330/3330314.png" alt="Студент" width="80">
                     <h2>Студент / Гість</h2>
                     <p>Перегляд розкладу, пошук за групами та викладачами</p>
                     <button onclick="showPage('guest-view')" class="btn-blue">Увійти як гість</button>
                 </div>
                 <div class="role-card">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3930/3930225.png" width="60">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3930/3930225.png" alt="Адмін" width="80">
                     <h2>Адміністратор</h2>
-                    <p>Редагування розкладу, контроль вичитки годин та логи</p>
+                    <p>Редагування розкладу, контроль вичитки годин</p>
                     <button onclick="showPage('login-view')" class="btn-dark">Авторизація</button>
                 </div>
             </div>
@@ -29,48 +29,127 @@
 
     <section id="login-view" class="container hidden">
         <div class="login-card">
-            <h2>Вхід для адміністратора</h2>
-            <input type="text" id="username" placeholder="Логін">
-            <input type="password" id="password" placeholder="Пароль">
+            <h2>Вхід в систему</h2>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Логін">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Пароль">
+            </div>
             <p id="login-error" class="error-msg"></p>
-            <button onclick="handleLogin()" class="btn-dark">Увійти</button>
-            <button onclick="showPage('role-selection')" class="btn-link">Назад</button>
+            <div class="btn-group">
+                <button onclick="handleLogin()" class="btn-dark">Увійти</button>
+                <button onclick="showPage('role-selection')" class="btn-outline">Назад</button>
+            </div>
         </div>
+    </section>
+
+    <section id="admin-view" class="container-full hidden">
+        <header class="navbar">
+            <span class="logo">Панель Адміністратора</span>
+            <div class="user-info">
+                <span id="user-role-label" style="font-weight: bold; margin-right: 15px;"></span>
+                <button onclick="showPage('guest-view')" class="btn-blue">Подивитись розклад</button>
+                <button onclick="showPage('role-selection')" class="btn-outline">Вийти</button>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="main-card" style="max-width: 600px; margin: 0 auto; padding: 30px;">
+                <h2>Додати нову пару вручну</h2>
+                <form id="add-schedule-form" onsubmit="submitNewSchedule(event)">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="date" id="admin-date" required style="margin-bottom: 0;">
+                        <select id="admin-lesson-number" required style="margin-bottom: 0;">
+                            <option value="">Оберіть пару...</option>
+                            <option value="1">1 пара (08:30 - 09:50)</option>
+                            <option value="2">2 пара (10:00 - 11:20)</option>
+                            <option value="3">3 пара (11:50 - 13:10)</option>
+                            <option value="4">4 пара (13:20 - 14:40)</option>
+                            <option value="5">5 пара (15:00 - 16:20)</option>
+                            <option value="6">6 пара (16:30 - 17:50)</option>
+                            <option value="7">7 пара (18:00 - 19:20)</option>
+                            <option value="8">8 пара (19:30 - 20:50)</option>
+                        </select>
+                    </div>
+
+                    <select id="admin-group" required><option value="">Оберіть групу...</option></select>
+                    <select id="admin-teacher" required><option value="">Оберіть викладача...</option></select>
+                    <select id="admin-subject" required><option value="">Оберіть предмет...</option></select>
+                    <select id="admin-audience" required><option value="">Оберіть кабінет...</option></select>
+                    
+                    <select id="admin-lesson-type" required>
+                        <option value="">Тип заняття...</option>
+                        <option value="Лекція">Лекція</option>
+                        <option value="Практика">Практика</option>
+                        <option value="Лабораторна">Лабораторна</option>
+                        <option value="Семінар">Семінар</option>
+                    </select>
+
+                    <button type="submit" class="btn-dark" style="width: 100%; margin-top: 15px;">💾 Зберегти пару в базу</button>
+                    <p id="admin-message" style="margin-top: 15px; font-weight: bold; text-align: center;"></p>
+                </form>
+
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <div style="background: #e0e7ff; padding: 20px; border-radius: 10px; border: 1px solid #c7d2fe;">
+                    <h3 style="margin-top: 0; color: #3730a3;">Авто-генератор розкладу</h3>
+                    <p style="font-size: 13px; color: #4f46e5;">Заповнити розклад для <b>всіх груп</b> на обраний тиждень випадковими парами.</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <input type="date" id="auto-generate-date" required style="margin-bottom: 0;">
+                        <button onclick="autoGenerateSchedule()" class="btn-blue" style="width: 100%;">Згенерувати розклад</button>
+                    </div>
+                    <p id="generate-message" style="margin-top: 10px; font-weight: bold; font-size: 14px; margin-bottom: 0;"></p>
+                </div>
+            </div>
+        </main>
     </section>
 
     <section id="guest-view" class="container-full hidden">
         <header class="navbar">
             <span class="logo">Розклад РФКІТ</span>
             <div class="user-info">
-                <span id="user-role-label">Гість</span>
-                <button onclick="showPage('role-selection')" class="btn-outline">Вийти</button>
+                <span id="guest-role-label">Режим: Гість</span>
+                <button onclick="showPage('role-selection')" class="btn-outline">На головну</button>
             </div>
         </header>
 
         <main class="content">
             <div class="filters">
                 <select id="filter-group"><option value="">Група: Усі</option></select>
-                <select id="filter-teacher"><option value="">Вчитель: Усі</option></select>
+                <select id="filter-teacher"><option value="">Викладач: Усі</option></select>
                 <select id="filter-subject"><option value="">Предмет: Усі</option></select>
+                
+                <select id="view-type" onchange="toggleViewMode()">
+                    <option value="day">На день</option>
+                    <option value="week">На тиждень</option>
+                </select>
+
                 <input type="date" id="filter-date">
                 <button onclick="loadSchedule()" class="btn-blue">Пошук</button>
             </div>
 
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th>День</th>
-                        <th>№</th>
-                        <th>Час</th>
-                        <th>Предмет</th>
-                        <th>Вчитель</th>
-                        <th>Клас</th>
-                        <th>Кабінет</th>
-                    </tr>
-                </thead>
-                <tbody id="schedule-body">
-                    </tbody>
-            </table>
+            <div class="table-container">
+                <table class="schedule-table" id="day-table">
+                    <thead>
+                        <tr>
+                            <th>День</th><th>№</th><th>Час</th><th>Предмет</th><th>Викладач</th><th>Група</th><th>Кабінет</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body-day"></tbody>
+                </table>
+
+                <table class="schedule-table hidden" id="week-table">
+                    <thead>
+                        <tr>
+                            <th>Пара \ День</th>
+                            <th>Понеділок</th><th>Вівторок</th><th>Середа</th><th>Четвер</th><th>П'ятниця</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body-week"></tbody>
+                </table>
+            </div>
         </main>
     </section>
 
